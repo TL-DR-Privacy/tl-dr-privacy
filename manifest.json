@@ -5,10 +5,11 @@
     "description": "A web browser extension that summarizes privacy policies for convenient reading",
     "author": "EECS582 Group 1",
     "icons": {
-        "16": *image location*,
-        "32": *image location*,
-        "48": *image location*,
-        "128": *image location*
+        "16": "icons/16.png",
+        "24": "icons/24.png",
+        "32": "icons/32.png",
+        "48": "icons/48.png",
+        "128": "icons/128.png"
     },
     "permisions": [
         "action",
@@ -26,8 +27,9 @@
         "webRequestBlocking"
     ],
     "host_permissions": [
-        "*://*/*"
-    ]
+        "http://*/*",
+        "https://*/*"
+    ],
     "content_scripts": [
         {
             "matches": ["https://*/*"],
@@ -39,8 +41,7 @@
         "service_worker": *background script*
     },
     "action": {
-        "default_popup": *image/menu that popsup upon entering website*,
-        "default_icon": *png image that appears upon entering website*
+        "default_popup": "index.html"
     }
 }
 
