@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "TL;DR Privacy Policy Summarizer",
     "version": "1.0.0",
-    "description": "A web browser extension that summarizes privacy policies for convenient reading",
+    "description": "A web browser extension that summarizes privacy policies for convenient reading and access",
     "author": "EECS582 Group 1",
     "icons": {
         "16": "icons/16.png",
