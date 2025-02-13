@@ -5,7 +5,6 @@
     "description": "A web browser extension that summarizes privacy policies for convenient reading",
     "author": "EECS582 Group 1",
     "permissions": [
-        "action",
         "activeTab",
         "background",
         "contextMenus",
