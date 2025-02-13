@@ -4,24 +4,22 @@
     "version": "1.0.0",
     "description": "A web browser extension that summarizes privacy policies for convenient reading",
     "author": "EECS582 Group 1",
-    "action": {
-        "default_popup": "index.html"
-    },
     "permissions": [
         "action",
         "activeTab",
         "background",
         "contextMenus",
-        "content_scripts",
         "downloads",
         "history",
         "notifications",
         "scripting",
         "storage",
         "webNavigation",
-        "webRequest",
-        "webRequestBlocking"
+        "webRequest"
     ],
+    "action": {
+        "default_popup": "index.html"
+    },
     "host_permissions": [
         "http://*/*",
         "https://*/*"
