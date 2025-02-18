@@ -40,7 +40,7 @@ function generateFilename(url) {
 
 //Extract text from a given URL
 async function extractPolicyText(url, visited = new Set()) {
-    if (visited.has(url)) return ""; // Avoid visiting the same page twice
+    if (visited.has(url)) return ""; //Avoid visiting the same page twice
     visited.add(url);
 
     console.log(`Extracting text from: ${url}`);
@@ -112,7 +112,7 @@ async function findPrivacyPolicy(url) {
     }
 }
 
-// Search Brave API for Privacy Policy if not found on site
+//Search Brave API for Privacy Policy if not found on site
 async function searchBravePrivacyPolicy(site) {
     if (!BRAVE_API_KEY) {
         console.error("Brave API Key is missing! Set BRAVE_API_KEY in .env.");
@@ -149,7 +149,7 @@ async function searchBravePrivacyPolicy(site) {
     }
 }
 
-// Main 
+//Main 
 (async () => {
     const websiteURL = await getWebsiteInput();
     if (!websiteURL.startsWith('http')) {
