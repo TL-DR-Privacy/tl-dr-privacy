@@ -4,8 +4,13 @@ const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const axios = require('axios');
+require('dotenv').config();
 
 puppeteer.use(StealthPlugin());
+
+const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
+const BRAVE_SEARCH_URL = 'https://api.search.brave.com/res/v1/web/search';
 
 //Get user input (website URL)
 const rl = readline.createInterface({
@@ -49,32 +54,6 @@ async function extractPolicyText(url, visited = new Set()) {
         const textContent = await page.evaluate(() => {
             return document.body.innerText;
         });
-
-        //Extract relevant links from the page
-        const links = await page.$$eval('a', (anchors) =>
-            anchors
-                .map(a => ({
-                    text: a.textContent.trim().toLowerCase(),
-                    href: a.href
-                }))
-                .filter(link =>
-                    link.href &&
-                    !link.href.includes("javascript:void(0)") &&
-                    (link.text.includes("privacy") ||
-                     link.text.includes("terms") ||
-                     link.text.includes("policy") ||
-                     link.text.includes("data") ||
-                     link.text.includes("security"))
-                )
-        );
-
-        console.log(`Found ${links.length} relevant links for further extraction.`);
-
-        //Recursively visit and extract text from each found link
-        for (let link of links) {
-            const additionalText = await extractPolicyText(link.href, visited);
-            return textContent + "\n\n" + additionalText;
-        }
 
         return textContent;
     } catch (error) {
@@ -122,8 +101,8 @@ async function findPrivacyPolicy(url) {
             console.log(`Privacy Policy Found: ${policyLink.href}`);
             return policyLink.href;
         } else {
-            console.log('No Privacy Policy Found.');
-            return null;
+            console.log('No Privacy Policy Found. Searching on Brave...');
+            return await searchBravePrivacyPolicy(url);
         }
     } catch (error) {
         console.error('Error fetching the website:', error.message);
@@ -133,13 +112,50 @@ async function findPrivacyPolicy(url) {
     }
 }
 
+// Search Brave API for Privacy Policy if not found on site
+async function searchBravePrivacyPolicy(site) {
+    if (!BRAVE_API_KEY) {
+        console.error("Brave API Key is missing! Set BRAVE_API_KEY in .env.");
+        return null;
+    }
+
+    const domain = new URL(site).hostname.replace("www.", ""); 
+    const query = `${domain} privacy policy`; 
+    const url = `${BRAVE_SEARCH_URL}?q=${encodeURIComponent(query)}&count=3`;
+
+    try {
+        console.log(`🔍 Searching Brave for privacy policy: ${query}`);
+        const response = await axios.get(url, {
+            headers: {
+                "Accept": "application/json",
+                "X-Subscription-Token": BRAVE_API_KEY
+            }
+        });
+
+        const results = response.data.web?.results || [];
+        if (results.length > 0) {
+            console.log("\nNo privacy policy found directly. Here are the top 3 search results:");
+            results.forEach((result, index) => {
+                console.log(`${index + 1}. ${result.url}`);
+            });
+            return results[0].url; // Use the first search result
+        } else {
+            console.log("No relevant results found.");
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error using Brave Search API: ${error.response?.status} - ${error.response?.data?.message || error.message}`);
+        return null;
+    }
+}
+
 // Main 
 (async () => {
     const websiteURL = await getWebsiteInput();
     if (!websiteURL.startsWith('http')) {
         console.log("Please enter a valid URL (e.g., https://www.example.com)");
     } else {
-        const policyURL = await findPrivacyPolicy(websiteURL);
+        let policyURL = await findPrivacyPolicy(websiteURL);
         if (policyURL) {
             const fullText = await extractPolicyText(policyURL);
             const filename = generateFilename(websiteURL);
