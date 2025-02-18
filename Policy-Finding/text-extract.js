@@ -2,10 +2,12 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const readline = require('readline');
 const fs = require('fs');
+const path = require('path');
+const { URL } = require('url');
 
 puppeteer.use(StealthPlugin());
 
-// Function to get user input (website URL)
+// Get user input (website URL)
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -20,9 +22,20 @@ async function getWebsiteInput() {
     });
 }
 
-// Function to extract text from a given URL
+// Generate a unique filename based on the website URL
+function generateFilename(url) {
+    try {
+        const domain = new URL(url).hostname.replace(/\./g, "_"); 
+        return `privacy_policy_${domain}.txt`;
+    } catch (error) {
+        console.error("Invalid URL format.");
+        return "privacy_policy_generic.txt";
+    }
+}
+
+// Extract text from a given URL
 async function extractPolicyText(url, visited = new Set()) {
-    if (visited.has(url)) return ""; // Avoid visiting the same page twice
+    if (visited.has(url)) return ""; 
     visited.add(url);
 
     console.log(`Extracting text from: ${url}`);
@@ -72,7 +85,7 @@ async function extractPolicyText(url, visited = new Set()) {
     }
 }
 
-// Function to find privacy policy link using policy.js logic
+// Find privacy policy link
 async function findPrivacyPolicy(url) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -129,8 +142,9 @@ async function findPrivacyPolicy(url) {
         const policyURL = await findPrivacyPolicy(websiteURL);
         if (policyURL) {
             const fullText = await extractPolicyText(policyURL);
-            fs.writeFileSync("privacy_policy_text.txt", fullText);
-            console.log("Privacy policy text saved to 'privacy_policy_text.txt'");
+            const filename = generateFilename(websiteURL);
+            fs.writeFileSync(filename, fullText);
+            console.log(`Privacy policy text saved to '${filename}'`);
         }
     }
 })();
