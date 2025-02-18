@@ -7,7 +7,7 @@ const { URL } = require('url');
 
 puppeteer.use(StealthPlugin());
 
-// Get user input (website URL)
+//Get user input (website URL)
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -22,10 +22,10 @@ async function getWebsiteInput() {
     });
 }
 
-// Generate a unique filename based on the website URL
+//Generate a unique filename based on the website URL
 function generateFilename(url) {
     try {
-        const domain = new URL(url).hostname.replace(/\./g, "_"); 
+        const domain = new URL(url).hostname.replace(/\./g, "_");
         return `privacy_policy_${domain}.txt`;
     } catch (error) {
         console.error("Invalid URL format.");
@@ -33,9 +33,9 @@ function generateFilename(url) {
     }
 }
 
-// Extract text from a given URL
+//Extract text from a given URL
 async function extractPolicyText(url, visited = new Set()) {
-    if (visited.has(url)) return ""; 
+    if (visited.has(url)) return ""; // Avoid visiting the same page twice
     visited.add(url);
 
     console.log(`Extracting text from: ${url}`);
@@ -45,12 +45,12 @@ async function extractPolicyText(url, visited = new Set()) {
     try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 
-        // Extract all visible text
+        //Extract all visible text
         const textContent = await page.evaluate(() => {
             return document.body.innerText;
         });
 
-        // Extract relevant links from the page
+        //Extract relevant links from the page
         const links = await page.$$eval('a', (anchors) =>
             anchors
                 .map(a => ({
@@ -70,7 +70,7 @@ async function extractPolicyText(url, visited = new Set()) {
 
         console.log(`Found ${links.length} relevant links for further extraction.`);
 
-        // Recursively visit and extract text from each found link
+        //Recursively visit and extract text from each found link
         for (let link of links) {
             const additionalText = await extractPolicyText(link.href, visited);
             return textContent + "\n\n" + additionalText;
@@ -85,7 +85,7 @@ async function extractPolicyText(url, visited = new Set()) {
     }
 }
 
-// Find privacy policy link
+//Find privacy policy link
 async function findPrivacyPolicy(url) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -93,7 +93,7 @@ async function findPrivacyPolicy(url) {
     try {
         await page.goto(url, { waitUntil: 'networkidle2' });
 
-        // Extract all links from the page
+        //Extract all links from the page
         const links = await page.$$eval('a', (anchors) =>
             anchors.map((a) => ({
                 text: a.textContent.trim().toLowerCase(),
@@ -101,17 +101,17 @@ async function findPrivacyPolicy(url) {
             }))
         );
 
-        // Define priority patterns for privacy policy URLs
+        //Define priority patterns for privacy policy URLs
         const priorityPatterns = [
             "/privacy-policy", "/privacy", "/legal/privacy", "/policies/privacy"
         ];
 
-        // Prioritize known privacy policy URL structures
+        //Prioritize known privacy policy URL structures
         let policyLink = links.find((link) =>
             priorityPatterns.some(pattern => link.href.includes(pattern))
         );
 
-        // If no priority match, fallback to any link containing "privacy"
+        //If no priority match, fallback to any link containing "privacy"
         if (!policyLink) {
             policyLink = links.find(
                 (link) => /privacy/i.test(link.text) || /privacy/i.test(link.href)
@@ -133,7 +133,7 @@ async function findPrivacyPolicy(url) {
     }
 }
 
-// Main function to run the script
+// Main 
 (async () => {
     const websiteURL = await getWebsiteInput();
     if (!websiteURL.startsWith('http')) {
