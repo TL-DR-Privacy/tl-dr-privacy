@@ -12,7 +12,7 @@ puppeteer.use(StealthPlugin());
 const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
 const BRAVE_SEARCH_URL = 'https://api.search.brave.com/res/v1/web/search';
 
-//Get user input (website URL)
+// Get user input (website URL)
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -27,7 +27,7 @@ async function getWebsiteInput() {
     });
 }
 
-//Generate a unique filename based on the website URL
+// Generate a unique filename based on the website URL
 function generateFilename(url) {
     try {
         const domain = new URL(url).hostname.replace(/\./g, "_");
@@ -38,9 +38,9 @@ function generateFilename(url) {
     }
 }
 
-//Extract text from a given URL and follow additional privacy-related links, avoiding duplicates
-async function extractPolicyText(url, visited = new Set(), extractedTexts = new Set()) {
-    if (visited.has(url)) return ""; //Avoid visiting the same page twice
+// Extract text from a given URL and follow additional links found within it
+async function extractPolicyText(url, visited = new Set()) {
+    if (visited.has(url)) return "";
     visited.add(url);
 
     console.log(`Extracting text from: ${url}`);
@@ -50,51 +50,42 @@ async function extractPolicyText(url, visited = new Set(), extractedTexts = new 
     try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 
-        //Extract all visible text
+        // Extract all visible text
         let textContent = await page.evaluate(() => document.body.innerText);
-        if (extractedTexts.has(textContent)) {
-            console.log("Duplicate content detected. Skipping...");
-            return "";
-        }
-        extractedTexts.add(textContent);
 
-        //Extract relevant links from the page
+        // Extract all additional links found on the privacy policy page
+        const policyDomain = new URL(url).hostname;
         const links = await page.$$eval('a', (anchors) =>
             anchors
-                .map(a => ({
-                    text: a.textContent.trim().toLowerCase(),
-                    href: a.href
-                }))
-                .filter(link =>
-                    link.href &&
-                    !link.href.includes("javascript:void(0)") &&
-                    (link.text.includes("privacy") ||
-                     link.text.includes("terms") ||
-                     link.text.includes("policy") ||
-                     link.text.includes("data") ||
-                     link.text.includes("security"))
-                )
+                .map(a => a.href)
+                .filter(href => {
+                    try {
+                        return href && new URL(href).hostname === policyDomain;
+                    } catch (err) {
+                        return false;
+                    }
+                })
         );
 
-        console.log(`Found ${links.length} additional privacy-related links.`);
+        console.log(`Found ${links.length} additional links on the main policy page.`);
         for (let link of links) {
-            if (!visited.has(link.href)) {
-                console.log(`Following additional link: ${link.href}`);
-                const additionalText = await extractPolicyText(link.href, visited, extractedTexts);
+            if (!visited.has(link)) {
+                console.log(`Following additional link: ${link}`);
+                const additionalText = await extractPolicyText(link, visited);
                 textContent += "\n\n" + additionalText;
             }
         }
 
+        await browser.close();
         return textContent;
     } catch (error) {
         console.error(`Error extracting from ${url}:`, error.message);
-        return "";
-    } finally {
         await browser.close();
+        return "";
     }
 }
 
-//Find privacy policy link
+// Find privacy policy link
 async function findPrivacyPolicy(url) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -102,7 +93,7 @@ async function findPrivacyPolicy(url) {
     try {
         await page.goto(url, { waitUntil: 'networkidle2' });
 
-        //Extract all links from the page
+        // Extract all links from the page
         const links = await page.$$eval('a', (anchors) =>
             anchors.map((a) => ({
                 text: a.textContent.trim().toLowerCase(),
@@ -110,23 +101,24 @@ async function findPrivacyPolicy(url) {
             }))
         );
 
-        //Define priority patterns for privacy policy URLs
+        // Define priority patterns for privacy policy URLs
         const priorityPatterns = [
             "/privacy-policy", "/privacy", "/legal/privacy", "/policies/privacy"
         ];
 
-        //Prioritize known privacy policy URL structures
+        // Prioritize known privacy policy URL structures
         let policyLink = links.find((link) =>
             priorityPatterns.some(pattern => link.href.includes(pattern))
         );
 
-        //If no priority match, fallback to any link containing "privacy"
+        // If no priority match, fallback to any link containing "privacy"
         if (!policyLink) {
             policyLink = links.find(
                 (link) => /privacy/i.test(link.text) || /privacy/i.test(link.href)
             );
         }
 
+        await browser.close();
         if (policyLink) {
             console.log(`Privacy Policy Found: ${policyLink.href}`);
             return policyLink.href;
@@ -136,13 +128,12 @@ async function findPrivacyPolicy(url) {
         }
     } catch (error) {
         console.error('Error fetching the website:', error.message);
-        return null;
-    } finally {
         await browser.close();
+        return null;
     }
 }
 
-//Search Brave API for Privacy Policy if not found on site
+// Search Brave API for Privacy Policy if not found on site
 async function searchBravePrivacyPolicy(site) {
     if (!BRAVE_API_KEY) {
         console.error("Brave API Key is missing! Set BRAVE_API_KEY in .env.");
@@ -179,7 +170,7 @@ async function searchBravePrivacyPolicy(site) {
     }
 }
 
-//Main 
+// Main 
 (async () => {
     const websiteURL = await getWebsiteInput();
     if (!websiteURL.startsWith('http')) {

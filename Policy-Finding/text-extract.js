@@ -124,7 +124,7 @@ async function searchBravePrivacyPolicy(site) {
     const url = `${BRAVE_SEARCH_URL}?q=${encodeURIComponent(query)}&count=3`;
 
     try {
-        console.log(`🔍 Searching Brave for privacy policy: ${query}`);
+        console.log(`Searching Brave for privacy policy: ${query}`);
         const response = await axios.get(url, {
             headers: {
                 "Accept": "application/json",
