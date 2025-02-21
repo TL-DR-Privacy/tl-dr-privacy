@@ -50,25 +50,40 @@ async function extractPolicyText(url, visited = new Set()) {
     try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 
-        // Extract all visible text
+        // Wait for all <a> elements to load before extracting them
+        await page.waitForSelector('a', { timeout: 10000 });
+
+        // Extract all visible text from the page
         let textContent = await page.evaluate(() => document.body.innerText);
 
         // Extract all additional links found on the privacy policy page
         const policyDomain = new URL(url).hostname;
-        const links = await page.$$eval('a', (anchors) =>
-            anchors
+        const links = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('a'))
                 .map(a => a.href)
-                .filter(href => {
-                    try {
-                        return href && new URL(href).hostname === policyDomain;
-                    } catch (err) {
-                        return false;
-                    }
-                })
-        );
+                .filter(href => href && !href.startsWith('javascript:'));
+        });
 
-        console.log(`Found ${links.length} additional links on the main policy page.`);
-        for (let link of links) {
+        // Convert relative URLs to absolute URLs and filter out unwanted links
+        const absoluteLinks = links
+            .map(link => (link.startsWith('/') ? new URL(link, url).href : link))
+            .filter(link => {
+                try {
+                    const parsedUrl = new URL(link);
+                    return (
+                        parsedUrl.hostname === policyDomain && // Ensure it's from the same domain
+                        !parsedUrl.pathname.includes("/login") && // Ignore login links
+                        !parsedUrl.pathname.includes("/recover") && // Ignore account recovery
+                        !parsedUrl.pathname.includes("/identify") && // Ignore identification flow
+                        !parsedUrl.search.includes("login_attempt") // Ignore login attempt queries
+                    );
+                } catch (err) {
+                    return false; // Ignore invalid URLs
+                }
+            });
+
+        console.log(`Found ${absoluteLinks.length} additional links on the main policy page.`);
+        for (let link of absoluteLinks) {
             if (!visited.has(link)) {
                 console.log(`Following additional link: ${link}`);
                 const additionalText = await extractPolicyText(link, visited);
@@ -84,6 +99,7 @@ async function extractPolicyText(url, visited = new Set()) {
         return "";
     }
 }
+
 
 // Find privacy policy link
 async function findPrivacyPolicy(url) {
