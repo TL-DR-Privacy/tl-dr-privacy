@@ -1,0 +1,14 @@
+/*Search box*/
+.search-box {
+    width: calc(100% - 16px); /*calc accounts for padding when figuring out width*/
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/*Header*/
+h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}

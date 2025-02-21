@@ -1,42 +1,52 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* App container */
+.app-container {
+  width: 320px;
+  padding: 20px;
+  padding-bottom: 70px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
+  position: relative;
+  color: black;
+  min-height: 400px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Content area */
+.content-area {
+  color: black;
+  overflow-y: auto; /*allow scrolling if contents overflow*/
+  height: calc(100% - 60px); /*subtract nav height*/
+  padding: 0 10px; /*some horizontal padding*/
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Navigation Buttons */
+.popup-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  /*margin-top: 10px;*/
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: white;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /*add shadow to top*/
+  z-index: 1000; /*nav stays on top*/
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.popup-nav button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #646cff;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.popup-nav button:hover {
+  background: #535bf2;
 }
