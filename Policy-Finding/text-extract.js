@@ -1,3 +1,12 @@
+/*********************************************************
+ * Raven Duong
+ * text-extract.js
+ * 
+ * 1) Find privacy policy based on policy.js+policy2.js
+ * 2) Extract text from the privacy policy page 
+ * 3) Save the extracted text to a file
+ * 
+ *********************************************************/
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const readline = require('readline');

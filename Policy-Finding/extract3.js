@@ -1,4 +1,5 @@
 /*********************************************************
+ * David Westerhause
  * extract3.js
  * 
  * 1) Finds privacy policy link with ORIGINAL logic.

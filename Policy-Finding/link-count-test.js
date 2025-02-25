@@ -1,3 +1,10 @@
+/*********************************************************
+ * Raven Duong
+ * link-count.js
+ * 
+ * Find out how many links are present on a webpage and list them out.
+ * 
+ *********************************************************/
 const puppeteer = require('puppeteer');
 
 async function countLinks(url) {
