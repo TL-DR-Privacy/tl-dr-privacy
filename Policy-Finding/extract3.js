@@ -1,5 +1,5 @@
 /*********************************************************
- * David Westerhause
+ * David Westerhaus & Raven Duong
  * extract3.js
  * 
  * 1) Finds privacy policy link with ORIGINAL logic.
