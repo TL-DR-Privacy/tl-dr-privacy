@@ -1,6 +1,7 @@
 /*********************************************************
  * Raven Duong
  * text-extract.js
+ * Created: 02/18/2025
  * 
  * 1) Find privacy policy based on policy.js+policy2.js
  * 2) Extract text from the privacy policy page 

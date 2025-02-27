@@ -1,6 +1,7 @@
 /*********************************************************
  * David Westerhaus & Raven Duong
  * extract3.js
+ * Created: 02/21/2025
  * 
  * 1) Finds privacy policy link with ORIGINAL logic.
  * 2) Recursively crawls relevant sub-links (max 10 pages).
