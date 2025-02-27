@@ -1,3 +1,18 @@
+/* 
+App.css
+This CSS file contains styling rules for the main application interface.
+It defines layout, color, spacing, and interactive states for a mobile-friendly UI.
+Programmers: Nayyir and Mark
+Created 2/19/2025
+Edited 2/27/2025
+Preconditions:  The HTML structure must include elements with the classes used in this stylesheet. The stylesheet must be properly linked in the HTML file for the styles to apply
+Postconditions: The UI will display with a centered app container, a scrollable content area, and a fixed, responsive navigation bar at the bottom.
+Error and Exceptions: If the browser does not support specific CSS properties, fallback styling may apply
+Side effects:
+Invariants:
+Known Faults:
+*/
+
 /* App container */
 .app-container {
   width: 320px;
