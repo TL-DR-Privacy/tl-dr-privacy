@@ -1,14 +1,20 @@
 /*********************************************************
- * Raven Duong
- * policy.js
+ * David Westerhaus
+ * policy2.js
  * 
- * 1) Uses Puppeteer to navigate a user-provided website URL and search for a privacy policy link
- * 2) Prioritizes URLs with common privacy-related keywords and extracts relevant links from the page
- * 3) If a privacy policy is found, it displays the link; otherwise, it informs the user that no policy was located
+ * 1) Extends the functionality of policy.js by integrating the Brave Search API to find privacy policies if one isn't located directly on the website
+ * 2) First, extract privacy policy links from the website using Puppeteer and predefined URL patterns
+ * 3) If scrapping by Puppeteer doesn't work, it queries Brave Search for 3 first relevant privacy policy links and displays the results
  * 
  *********************************************************/
 const puppeteer = require('puppeteer');
 const readline = require('readline');
+const axios = require('axios');
+require('dotenv').config(); 
+
+const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
+const BRAVE_SEARCH_URL = 'https://api.search.brave.com/res/v1/web/search';
+console.log('API Key:', process.env.BRAVE_API_KEY); // Debugging line
 
 // Function to get user input (website URL)
 const rl = readline.createInterface({
@@ -64,12 +70,45 @@ async function findPrivacyPolicy(url) {
         if (policyLink) {
             console.log(`Privacy Policy Found: ${policyLink.href}`);
         } else {
-            console.log('No Privacy Policy Found.');
+            console.log('No Privacy Policy Found. Searching on Brave...');
+            await searchBravePrivacyPolicy(url);
         }
     } catch (error) {
         console.error('Error fetching the website:', error.message);
     } finally {
         await browser.close();
+    }
+}
+
+/**
+ * Searches Brave Search API for a privacy policy.
+ * @param {string} websiteName - The website name to search for privacy policy.
+ */
+async function searchBravePrivacyPolicy(websiteName) {
+    try {
+        const query = websiteName + " privacy policy";
+        const response = await axios.get(BRAVE_SEARCH_URL, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Subscription-Token': BRAVE_API_KEY
+            },
+            params: {
+                q: query,
+                count: 3
+            }
+        });
+
+        const results = response.data.web.results;
+        if (results && results.length > 0) {
+            console.log('\n🔎 No privacy policy found directly. Here are the top 3 search results:');
+            results.forEach((result, index) => {
+                console.log(`${result.url}`);
+            });
+        } else {
+            console.log('No relevant results found.');
+        }
+    } catch (error) {
+        console.error('Error fetching search results:', error.response ? error.response.data : error.message);
     }
 }
 
