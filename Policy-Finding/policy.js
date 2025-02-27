@@ -1,3 +1,12 @@
+/*********************************************************
+ * Raven Duong
+ * policy.js
+ * 
+ * 1) Uses Puppeteer to navigate a user-provided website URL and search for a privacy policy link
+ * 2) Prioritizes URLs with common privacy-related keywords and extracts relevant links from the page
+ * 3) If a privacy policy is found, it displays the link; otherwise, it informs the user that no policy was located
+ * 
+ *********************************************************/
 const puppeteer = require('puppeteer');
 const readline = require('readline');
 
