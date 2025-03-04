@@ -1,3 +1,12 @@
+/*********************************************************
+ * David Westerhaus
+ * policy2.js
+ * 
+ * 1) Extends the functionality of policy.js by integrating the Brave Search API to find privacy policies if one isn't located directly on the website
+ * 2) First, extract privacy policy links from the website using Puppeteer and predefined URL patterns
+ * 3) If scrapping by Puppeteer doesn't work, it queries Brave Search for 3 first relevant privacy policy links and displays the results
+ * 
+ *********************************************************/
 const puppeteer = require('puppeteer');
 const readline = require('readline');
 const axios = require('axios');
@@ -99,7 +108,7 @@ async function searchBravePrivacyPolicy(websiteName) {
             console.log('No relevant results found.');
         }
     } catch (error) {
-        console.error('❌ Error fetching search results:', error.response ? error.response.data : error.message);
+        console.error('Error fetching search results:', error.response ? error.response.data : error.message);
     }
 }
 
