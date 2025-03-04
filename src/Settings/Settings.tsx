@@ -4,7 +4,7 @@
 
 import { FC } from "react";
 import "./Settings.css";
-import React from "react";
+//import React from "react";
 
 const Settings: FC = () => {
   return (

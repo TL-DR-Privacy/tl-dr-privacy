@@ -4,7 +4,7 @@
 
 import { FC } from "react";
 import "./History.css";
-import React from "react";
+//import React from "react";
 
 const History: FC = () => {
   return (

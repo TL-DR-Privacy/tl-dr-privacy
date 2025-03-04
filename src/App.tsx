@@ -3,13 +3,13 @@
 // Site, history, search and settings can be toggled between using the navbar
 // Programmers: Nayyir and Mark
 // Created 2/19/2025
-// Edited 2/27/2025
-// Preconditions: React development environment is set up. Site, History, Serach and Setting exist in the correct path. App.css is availible for styling.
+// Edited 3/4/2025
+// Preconditions: React development environment is set up. Site, History, Search and Setting exist in the correct path. App.css is availible for styling.
 // Postconditions: The component renders the content of the page corresponding to the activePage state.
 // Error and Exceptions: If activePage value is invalid, Site is the default component.
 // Side effects:
 // Invariants:
-// Known Faults:
+// Known Faults: can't display the h2 header from each page in the colored header bar next to the logo yet
 
 import { useState } from "react";
 import "./App.css";
@@ -17,7 +17,7 @@ import Site from "./Site/Site";
 import History from "./History/History";
 import Search from "./Search/Search";
 import Settings from "./Settings/Settings";
-import React from "react";
+//import React from "react";
 
 export default function App() {
   const [activePage, setActivePage] = useState("site");
@@ -41,6 +41,11 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <div className="header-section">
+        <div className="logo-container">
+          <img src="128.png" alt="TLDR Privacy Logo" className="app-logo"/> {/*adds logo to top*/}
+        </div>
+      </div>
       <div className="content-area">{renderActivePage()}</div>
       {/*display of navbar buttons*/}
       <div className="popup-nav">

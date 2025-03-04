@@ -4,7 +4,7 @@ This CSS file contains styling rules for the main application interface.
 It defines layout, color, spacing, and interactive states for a mobile-friendly UI.
 Programmers: Nayyir and Mark
 Created 2/19/2025
-Edited 2/27/2025
+Edited 3/4/2025
 Preconditions:  The HTML structure must include elements with the classes used in this stylesheet. The stylesheet must be properly linked in the HTML file for the styles to apply
 Postconditions: The UI will display with a centered app container, a scrollable content area, and a fixed, responsive navigation bar at the bottom.
 Error and Exceptions: If the browser does not support specific CSS properties, fallback styling may apply
@@ -77,7 +77,7 @@ Known Faults:
   background-color: #f8f8f8;
   border-bottom: 1px solid #e0e0e0;
   z-index: 1000;
-  height: 48px;
+  height: 56px; /*adjusts header bar height for larger logo*/
 }
 
 .logo-container {
@@ -86,12 +86,12 @@ Known Faults:
 }
 
 .app-logo {
-  height: 32px;
+  height: 58px; /*changes logo size*/
   width: auto;
 }
 
 .content-area {
-  margin-top: 48px;
+  margin-top: 56px; /*match header height*/
   padding: 16px;
 }
 

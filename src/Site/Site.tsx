@@ -4,7 +4,7 @@
 
 import { FC } from "react";
 import "./Site.css";
-import React from "react";
+//import React from "react";
 
 const Site: FC = () => {
   return (

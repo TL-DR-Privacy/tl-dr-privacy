@@ -3,7 +3,7 @@
 
 import { FC } from "react";
 import "./Search.css";
-import React from "react";
+//import React from "react";
 
 const Search: FC = () => {
   return (
