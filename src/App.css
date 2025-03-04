@@ -50,3 +50,37 @@
 .popup-nav button:hover {
   background: #535bf2;
 }
+
+.header-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #e0e0e0;
+  z-index: 1000;
+  height: 48px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo {
+  height: 32px;
+  width: auto;
+}
+
+.content-area {
+  margin-top: 48px;
+  padding: 16px;
+}
+
+.content-area h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
