@@ -9,7 +9,7 @@ import "./Site.css";
 const Site: FC = () => {
   return (
     <div>
-      <h2>Site: facebook.com</h2>
+      {/*<h2>Site: facebook.com</h2>*/}
       <h3>Permissions requested</h3>
       <p>
         <strong>Location:</strong> This permission does... <br />

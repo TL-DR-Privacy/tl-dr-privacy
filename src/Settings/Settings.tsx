@@ -9,7 +9,7 @@ import "./Settings.css";
 const Settings: FC = () => {
   return (
     <div>
-      <h2>Settings</h2>
+      {/*<h2>Settings</h2>*/}
       <p>Have TLDR Privacy auto-opt you out of the following:</p>
       <div className="checkbox-list">
         <label className="checkbox-item">
