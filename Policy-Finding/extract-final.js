@@ -1,16 +1,19 @@
 /*********************************************************
  * David Westerhaus & Raven Duong
- * extract3.js
+ * extract-final.js
  * Created: 02/21/2025
  * 
  * 1) Finds privacy policy link with ORIGINAL logic.
  * 2) Recursively crawls relevant sub-links (max 10 pages).
  * 3) Falls back to Brave Search if no policy link found.
  * 
+ * Adjustment:
+ * - The website crawling is now run headless 
+ * - 
  *********************************************************/
 
 const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth'); //this is used to reduce detection and bot blocking from website 
 const readline = require('readline');
 const fs = require('fs');
 const axios = require('axios');
@@ -50,15 +53,18 @@ function generateFilename(websiteURL) {
 }
 
 // --- HELPER: Check if a link is "relevant" (heuristics) ---
+/**
+ * Filters out irrelevant links by:
+ *  - Checking if they belong to the same domain
+ *  - Avoiding links that point to language-specific pages
+ *  - Searching for keywords that indicate privacy-related content
+ */
 function isRelevantLink(linkText, linkUrl, baseDomain) {
     // Example "disallowed language code" patterns
     const disallowedLangRegex = /\/(ar|de|es|fr|it|nl|pl|pt|ru|zh)\//i;
-
     // If your site uses query params like `?lang=es` or `?locale=fr`, you can add:
     const disallowedLangParamRegex = /[?&](lang|locale)=(ar|de|es|fr|it|nl|pl|pt|ru|zh)/i;
 
-
-    
     // Only same domain
     let domainMatches = false;
     try {
@@ -95,7 +101,6 @@ async function extractPolicyText(url, visited, maxPages, pageCount) {
   if (pageCount.count >= maxPages) {
     return "";
   }
-
   // If we've visited this exact URL before, skip it
   if (visited.has(url)) {
     return "";
@@ -141,7 +146,7 @@ async function extractPolicyText(url, visited, maxPages, pageCount) {
     }
 
   } catch (error) {
-    console.error(`❌ Error extracting text from ${url}:`, error.message);
+    console.error(`Error extracting text from ${url}:`, error.message);
   } finally {
     if (browser) await browser.close();
   }
@@ -185,14 +190,18 @@ async function searchBravePrivacyPolicy(site) {
       return null;
     }
   } catch (error) {
-    console.error('❌ Error fetching Brave search results:', error.message);
+    console.error('Error fetching Brave search results:', error.message);
     return null;
   }
 }
 
 // --- Original "Find Privacy Policy" logic, unchanged ---
+/**
+ * Finds a privacy policy page link on the website.
+ * If no link is found, it falls back to Brave Search.
+ */
 async function findPrivacyPolicy(url) {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true }); // headless: false for debugging, true for production 
   const page = await browser.newPage();
 
   try {
@@ -239,7 +248,7 @@ async function findPrivacyPolicy(url) {
       return await searchBravePrivacyPolicy(url);
     }
   } catch (error) {
-    console.error('❌ Error fetching the website:', error.message);
+    console.error('Error fetching the website:', error.message);
     await browser.close();
     return null;
   }
@@ -271,5 +280,5 @@ async function findPrivacyPolicy(url) {
   // 3) Save to a file
   const filename = generateFilename(site);
   fs.writeFileSync(filename, fullText, 'utf8');
-  console.log(`\n✅ Privacy policy text (max ${maxPages} pages) saved to: ${filename}`);
+  console.log(`\n Privacy policy text (max ${maxPages} pages) saved to: ${filename}`);
 })();
