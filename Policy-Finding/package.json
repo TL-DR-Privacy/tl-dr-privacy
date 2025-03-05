@@ -1,6 +1,10 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
-    "puppeteer": "^24.2.0"
+    "dotenv": "^16.4.7",
+    "puppeteer": "^24.3.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
