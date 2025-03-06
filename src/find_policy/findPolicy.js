@@ -1,15 +1,14 @@
 /*********************************************************
  * David Westerhaus & Raven Duong
  * findPolicy.js
- * Created: 02/21/2025
+ * Created: 03/06/2025
  * 
- * 1) Finds privacy policy link with ORIGINAL logic.
- * 2) Recursively crawls relevant sub-links (max 10 pages).
- * 3) Falls back to Brave Search if no policy link found.
- * 
- * Adjustment:
- * - The website crawling is now run headless 
- * - 
+ * 1) When given a URL, this script will attempt to find a privacy policy link on the page. It does this by:
+ *   - Prioritizing known privacy policy URL structures
+ *   - Fallback to any link containing "privacy"
+ *   - If no policy link found, it will search on Brave
+ * 2) If a policy link is found, it will return the URL.
+ * 3) If no policy link is found, it will return null.
  *********************************************************/
 
 import puppeteer from 'puppeteer-extra';
@@ -52,8 +51,7 @@ export async function findPrivacyPolicy(url) {
       );
     }
 
-    // (In the original code you had a check for "privacy_mutation_token",
-    //  but it's not specifically included here. If you need it, add:)
+  // was in original code but idk if we need
     // if (policyLink && policyLink.href.includes("privacy_mutation_token")) {
     //   policyLink = null;
     // }

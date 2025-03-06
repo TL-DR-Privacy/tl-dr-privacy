@@ -1,3 +1,13 @@
+/*********************************************************
+ * David Westerhaus & Raven Duong
+ * helpers.js
+ * Created: 02/21/2025
+ * 
+ * 1) Contains helper functions for the policy-finding process.
+ * 2) Includes functions for user input and filename generation.
+ * 3) Defines a function to check if a link is relevant.
+ *********************************************************/
+
 import { URL } from 'url';
 import readline from 'readline';
 

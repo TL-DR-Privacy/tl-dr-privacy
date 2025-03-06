@@ -1,3 +1,12 @@
+/*********************************************************
+ * David Westerhaus
+ * braveSearch.js
+ * Created: 03/06/2025
+ * 
+ * 1) Uses Brave Search API to find privacy policy links.
+ * 2) Returns the top results.
+ *********************************************************/
+
 import axios from 'axios';
 import { URL } from 'url';
 import dotenv from 'dotenv';

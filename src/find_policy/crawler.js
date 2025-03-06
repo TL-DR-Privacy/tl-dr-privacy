@@ -1,3 +1,16 @@
+/*********************************************************
+ * David Westerhaus & Raven Duong
+ * crawler.js
+ * Created: 03/06/2025
+ * 
+ * 1) Recursively crawls relevant sub-links (max 10 pages).
+ * 2) Uses Puppeteer to extract text from the page.
+ * 3) Heuristics: only follow links from the same domain
+ *    that contain relevant keywords in text or path.
+ * 4) Stops crawling when the page limit is reached.
+ * 5) Returns the concatenated text content.
+ *********************************************************/
+
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { isRelevantLink } from './helpers.js';
