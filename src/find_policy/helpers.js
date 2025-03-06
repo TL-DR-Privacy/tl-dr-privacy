@@ -6,6 +6,7 @@
  * 1) Contains helper functions for the policy-finding process.
  * 2) Includes functions for user input and filename generation.
  * 3) Defines a function to check if a link is relevant.
+ * 4) Now includes S3 duplicate prevention before uploading.
  *********************************************************/
 
 import AWS from 'aws-sdk';
@@ -17,29 +18,58 @@ dotenv.config();
 
 // AWS S3 Configuration
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION
 });
 
 const s3 = new AWS.S3();
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
-// --- Upload to S3 ---
-export async function uploadToS3(filename, content) {
-  const params = {
-      Bucket: BUCKET_NAME,
-      Key: filename,
-      Body: content,
-      ContentType: "text/plain"
-  };
+// --- Check If Privacy Policy Already Exists in S3 ---
+export async function checkIfFileExists(filename) {
+    const params = {
+        Bucket: BUCKET_NAME,
+        Key: filename
+    };
 
-  try {
-      await s3.upload(params).promise();
-      console.log(`Uploaded to S3: ${filename}`);
-  } catch (error) {
-      console.error("Error uploading to S3:", error);
-  }
+    try {
+        await s3.headObject(params).promise(); // Check if file exists
+        console.log(`Privacy policy already exists in S3: ${filename}`);
+        return true; // File exists
+    } catch (error) {
+        if (error.code === 'NotFound') {
+            return false; // File does not exist
+        } else {
+            console.error("Error checking S3:", error);
+            return false;
+        }
+    }
+}
+
+// --- Upload to S3 (Prevents Duplicates) ---
+export async function uploadToS3(filename, content) {
+    // First, check if the file already exists
+    const exists = await checkIfFileExists(filename);
+    if (exists) {
+        console.log(`Skipping upload: Privacy policy for ${filename} already exists in S3.`);
+        return; // Stop function if file exists
+    }
+
+    // Upload if the file does not exist
+    const params = {
+        Bucket: BUCKET_NAME,
+        Key: filename,
+        Body: content,
+        ContentType: "text/plain"
+    };
+
+    try {
+        await s3.upload(params).promise();
+        console.log(`Uploaded to S3: ${filename}`);
+    } catch (error) {
+        console.error("Error uploading to S3:", error);
+    }
 }
 
 // --- User Input (website URL) ---

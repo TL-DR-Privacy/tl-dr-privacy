@@ -12,7 +12,7 @@
  * all this will probably be replaced with code inside the actual browser extension code
  *********************************************************/
 import fs from 'fs';
-import { getWebsiteInput, generateFilename, uploadToS3 } from './helpers.js';
+import { getWebsiteInput, generateFilename, uploadToS3, checkIfFileExists } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 
@@ -21,6 +21,15 @@ import { extractPolicyText } from './crawler.js';
   if (!site.startsWith('http')) {
     console.log("Please enter a valid URL (e.g., https://www.example.com)");
     process.exit(1);
+  }
+  // Generate expected filename
+  const filename = generateFilename(site);
+
+  // Check if policy exists in AWS S3 BEFORE crawling
+  const exists = await checkIfFileExists(filename);
+  if (exists) {
+      console.log(`Privacy policy for ${site} already exists in S3. Skipping crawl.`);
+      process.exit(0); // Stop execution if file exists
   }
 
   // 1) Attempt to find a policy link on the main site
@@ -42,10 +51,7 @@ import { extractPolicyText } from './crawler.js';
     .replace(/[^\x21-\x7E]/g, '');    // Remove characters outside the printable ASCII range (english only). We might revisit this later to add support for other langugaes.
   
   // 3) Save to a file and upload to S3
-  const filename = generateFilename(site);
-  console.log(`\nPrivacy policy text saved to S3: ${filename}`);
-
-  // Upload to S3
+  console.log(`\nUploading privacy policy to S3: ${filename}`);
   await uploadToS3(filename, finalText);
 
 })();
