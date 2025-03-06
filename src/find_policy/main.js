@@ -23,6 +23,8 @@ import { summarizeText } from './gemini.js';
     console.log("Please enter a valid URL (e.g., https://www.example.com)");
     process.exit(1);
   }
+  // Generate expected filename
+  const filename = generateFilename(site);
 
   // 1) Attempt to find a policy link on the main site
   const policyUrl = await findPrivacyPolicy(site);
@@ -48,9 +50,8 @@ import { summarizeText } from './gemini.js';
   console.log("Summary: ", summary);
 
   // 4) Upload the summary to SQL
-  const filename = generateFilename(site);
-  console.log(`\nTL;DR summary saved to SQL as: ${filename}`);
-  await uploadToS3(filename, summary);
+  console.log(`\nUploading privacy policy to S3: ${filename}`);
+  await uploadToS3(filename, finalText);
 
 })();
 
