@@ -8,8 +8,39 @@
  * 3) Defines a function to check if a link is relevant.
  *********************************************************/
 
+import AWS from 'aws-sdk';
 import { URL } from 'url';
 import readline from 'readline';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// AWS S3 Configuration
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+});
+
+const s3 = new AWS.S3();
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+
+// --- Upload to S3 ---
+export async function uploadToS3(filename, content) {
+  const params = {
+      Bucket: BUCKET_NAME,
+      Key: filename,
+      Body: content,
+      ContentType: "text/plain"
+  };
+
+  try {
+      await s3.upload(params).promise();
+      console.log(`Uploaded to S3: ${filename}`);
+  } catch (error) {
+      console.error("Error uploading to S3:", error);
+  }
+}
 
 // --- User Input (website URL) ---
 export function getWebsiteInput() {

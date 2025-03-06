@@ -40,9 +40,14 @@ import { extractPolicyText } from './crawler.js';
   const finalText = fullText
     .replace(/\s+/g, '')            // Strip out ALL white space
     .replace(/[^\x21-\x7E]/g, '');    // Remove characters outside the printable ASCII range (english only). We might revisit this later to add support for other langugaes.
-
-  // 3) Save to a file
+  
+  // 3) Save to a file and upload to S3
   const filename = generateFilename(site);
   fs.writeFileSync(filename, finalText, 'utf8');
-  console.log(`\nPrivacy policy text (max ${maxPages} pages, with no whitespace) saved to: ${filename}`);
+  console.log(`\nPrivacy policy text saved to: ${filename}`);
+
+  // Upload to S3
+  await uploadToS3(filename, finalText);
+
 })();
+
