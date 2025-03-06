@@ -15,6 +15,7 @@ import fs from 'fs';
 import { getWebsiteInput, generateFilename, uploadToS3 } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
+import { summarizeText } from './gemini.js';
 
 (async () => {
   const site = await getWebsiteInput();
@@ -41,12 +42,15 @@ import { extractPolicyText } from './crawler.js';
     .replace(/\s+/g, '')            // Strip out ALL white space
     .replace(/[^\x21-\x7E]/g, '');    // Remove characters outside the printable ASCII range (english only). We might revisit this later to add support for other langugaes.
   
-  // 3) Save to a file and upload to S3
-  const filename = generateFilename(site);
-  console.log(`\nPrivacy policy text saved to S3: ${filename}`);
+  // 3) Summarize the cleaned text using your Gemini API to produce a TL;DR summary
+  const summary = await summarizeText(finalText);
 
-  // Upload to S3
-  await uploadToS3(filename, finalText);
+  console.log("Summary: ", summary);
+
+  // 4) Upload the summary to SQL
+  const filename = generateFilename(site);
+  console.log(`\nTL;DR summary saved to SQL as: ${filename}`);
+  await uploadToS3(filename, summary);
 
 })();
 

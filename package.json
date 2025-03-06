@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.23.0",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
