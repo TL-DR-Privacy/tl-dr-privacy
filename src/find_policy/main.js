@@ -12,7 +12,7 @@
  * all this will probably be replaced with code inside the actual browser extension code
  *********************************************************/
 import fs from 'fs';
-import { getWebsiteInput, generateFilename, uploadToS3 } from './helpers.js';
+import { getWebsiteInput, generateFilename, uploadToS3, checkIfFileExists} from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';
@@ -25,6 +25,13 @@ import { summarizeText } from './gemini.js';
   }
   // Generate expected filename
   const filename = generateFilename(site);
+
+  // Check if policy exists in AWS S3 BEFORE crawling
+  const exists = await checkIfFileExists(filename);
+  if (exists) {
+      console.log(`Privacy policy for ${site} already exists in S3. Skipping crawl.`);
+      process.exit(0); // Stop execution if file exists
+  }
 
   // 1) Attempt to find a policy link on the main site
   const policyUrl = await findPrivacyPolicy(site);
