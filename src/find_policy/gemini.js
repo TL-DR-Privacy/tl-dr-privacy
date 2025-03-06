@@ -10,7 +10,8 @@ export async function summarizeText(text) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     // Create a prompt to summarize text in a TL;DR format
-    const prompt = `Summarize the following text in TL;DR format:\n\n${text}`;
+    const prompt = `Below is a privacy policy. Please read it in full, then produce a clear, concise bullet-point summary that covers: What data they collect. How they use that data (and for what purposes). Who they share it with (e.g., affiliates, partners, advertisers). How long they retain the data. Key user rights/controls (how people can access, delete, or restrict their data). Other notable ‘gotchas’ or disclaimers (location tracking, law enforcement disclosures, child protection, etc.).
+    Provide the summary in simple TL;DR language and keep it focused on core takeaways. Omit fluff. Plain text only: \n\n${text}`;
     
     const result = await model.generateContent(prompt);
     return result.response.text();

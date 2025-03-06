@@ -26,11 +26,12 @@ import { summarizeText } from './gemini.js';
   // Generate expected filename
   const filename = generateFilename(site);
 
-  // Check if policy exists in AWS S3 BEFORE crawling
-  const exists = await checkIfFileExists(filename);
-  if (exists) {
-      console.log(`Privacy policy for ${site} already exists in S3. Skipping crawl.`);
-      process.exit(0); // Stop execution if file exists
+  // 0) First, check if the privacy policy already exists in S3 and get its content
+  const existingContent = await checkIfFileExists(filename);
+  if (existingContent) {
+    console.log(`Privacy policy for ${site} already exists in S3. Summary:`);
+    console.log(existingContent);
+    process.exit(0); // Exit if found
   }
 
   // 1) Attempt to find a policy link on the main site

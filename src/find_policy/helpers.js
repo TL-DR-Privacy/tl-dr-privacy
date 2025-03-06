@@ -26,24 +26,25 @@ const s3 = new AWS.S3();
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 
-// --- Check If Privacy Policy Already Exists in S3 ---
+// --- Check If Privacy Policy Already Exists in S3 and Return Its Content ---
 export async function checkIfFileExists(filename) {
   const params = {
-      Bucket: BUCKET_NAME,
-      Key: filename
+    Bucket: BUCKET_NAME,
+    Key: filename
   };
 
   try {
-      await s3.headObject(params).promise(); // Check if file exists
-      console.log(`Privacy policy already exists in S3: ${filename}`);
-      return true; // File exists
+    // Try to retrieve the object
+    const data = await s3.getObject(params).promise();
+    console.log(`Privacy policy already exists in S3: ${filename}`);
+    return data.Body.toString('utf8'); // Return file content as a string
   } catch (error) {
-      if (error.code === 'NotFound') {
-          return false; // File does not exist
-      } else {
-          console.error("Error checking S3:", error);
-          return false;
-      }
+    if (error.code === 'NotFound') {
+      return null; // File does not exist
+    } else {
+      console.error("Error checking S3:", error);
+      return null;
+    }
   }
 }
 
