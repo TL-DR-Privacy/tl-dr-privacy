@@ -12,7 +12,7 @@
  * all this will probably be replaced with code inside the actual browser extension code
  *********************************************************/
 import fs from 'fs';
-import { getWebsiteInput, generateFilename } from './helpers.js';
+import { getWebsiteInput, generateFilename, uploadToS3 } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 
@@ -43,8 +43,7 @@ import { extractPolicyText } from './crawler.js';
   
   // 3) Save to a file and upload to S3
   const filename = generateFilename(site);
-  fs.writeFileSync(filename, finalText, 'utf8');
-  console.log(`\nPrivacy policy text saved to: ${filename}`);
+  console.log(`\nPrivacy policy text saved to S3: ${filename}`);
 
   // Upload to S3
   await uploadToS3(filename, finalText);
