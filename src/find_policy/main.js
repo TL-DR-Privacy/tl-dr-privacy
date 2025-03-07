@@ -12,7 +12,7 @@
  * all this will probably be replaced with code inside the actual browser extension code
  *********************************************************/
 import fs from 'fs';
-import { getWebsiteInput, generateFilename, uploadToS3, checkIfFileExists} from './helpers.js';
+import { getWebsiteInput, generateFilename, uploadToS3, getExistingPolicy} from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';
@@ -27,7 +27,7 @@ import { summarizeText } from './gemini.js';
   const filename = generateFilename(site);
 
   // 0) First, check if the privacy policy already exists in S3 and get its content
-  const existingContent = await checkIfFileExists(filename);
+  const existingContent = await getExistingPolicy(filename);
   if (existingContent) {
     console.log(`Privacy policy for ${site} already exists in S3. Summary:`);
     console.log(existingContent);
@@ -59,7 +59,7 @@ import { summarizeText } from './gemini.js';
 
   // 4) Upload the summary to SQL
   console.log(`\nUploading privacy policy to S3: ${filename}`);
-  await uploadToS3(filename, finalText);
+  await uploadToS3(filename, summary);
 
 })();
 
