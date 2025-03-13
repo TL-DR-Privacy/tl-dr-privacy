@@ -14,11 +14,17 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
+ * - Requires Puppeteer with the stealth plugin installed
+ * - Requires a valid Brave Search API key (if Brave search is needed)
+ * - Input must be a valid URL
  * Postconditions: 
- * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * - Returns a string containing the privacy policy URL if found
+ * - If no policy is found, returns the top search result from Brave Search
+ * - If all attempts fail, returns null
+ * Error and exceptions: None
+ * Side effects: None
+ * Invariants: None
+ * Any known faults: None
  *********************************************************/
 
 import puppeteer from 'puppeteer-extra';

@@ -21,7 +21,8 @@
  * Preconditions: 
  * - Requires a valid Google Gemini API key stored in environment variables.
  * - Input text should be a privacy policy or similar document.
- * Postconditions: Outputs a summarized version of the privacy policy in a clear bullet-point format
+ * Postconditions: 
+ * - Outputs a summarized version of the privacy policy in a clear bullet-point format
  * Error and exceptions: 
  * Side effects: None
  * Invariants: None

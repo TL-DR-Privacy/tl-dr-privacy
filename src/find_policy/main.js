@@ -15,11 +15,17 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
+ * - Requires a valid website URL input
+ * - AWS S3 credentials must be set in environment variables
+ * - The `findPolicy.js`, `crawler.js`, `helpers.js`, and `gemini.js` modules must be correctly implemented
+ * - The Google Gemini API key must be configured for summarization
  * Postconditions: 
- * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * - If a policy is found, a cleaned and summarized version is stored in AWS S3
+ * - If no policy is found, the script exits gracefully with appropriate messages
+ * Error and exceptions: None
+ * Side effects: None
+ * Invariants: None
+ * Any known faults: None
  *********************************************************/
 import fs from 'fs';
 import { getWebsiteInput, generateFilename, uploadToS3, getExistingPolicy} from './helpers.js';

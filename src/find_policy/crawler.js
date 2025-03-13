@@ -14,11 +14,16 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
+ * - Requires Puppeteer and puppeteer-extra with the stealth plugin.
+ * - Input URL must be valid and accessible.
+ * - The `isRelevantLink` function must be correctly implemented.
  * Postconditions: 
- * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * - Returns a string containing the extracted text from the crawled pages.
+ * - Stops when the page limit is reached.
+ * Error and exceptions: None
+ * Side effects:  None
+ * Invariants:  None
+ * Any known faults: None
  *********************************************************/
 
 import puppeteer from 'puppeteer-extra';

@@ -12,11 +12,17 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
+ * - Requires AWS SDK v3 for S3 operations
+ * - Environment variables must include valid AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET_NAME`)
+ * - The input website URL must be valid
  * Postconditions: 
- * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * - Returns extracted privacy policy text from S3 if available
+ * - Uploads new privacy policies to S3 if they don’t already exist
+ * - Provides heuristic-based filtering of relevant links
+ * Error and exceptions: None
+ * Side effects: None
+ * Invariants: None
+ * Any known faults: None
  * 
  *********************************************************/
 
