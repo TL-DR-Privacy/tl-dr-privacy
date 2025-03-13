@@ -9,11 +9,15 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
+ * - Requires a valid Brave Search API key stored in the environment variables
+ * - The input must be a valid website URL
  * Postconditions: 
- * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * - Returns a URL string of the most relevant privacy policy found
+ * - If no results are found, returns null
+ * Error and exceptions: None
+ * Side effects: None
+ * Invariants: None
+ * Any known faults: None
  *********************************************************/
 
 import axios from 'axios';

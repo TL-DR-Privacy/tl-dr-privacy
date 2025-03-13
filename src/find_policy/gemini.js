@@ -19,11 +19,13 @@
  * Created: 03/06/2025
  * Revised: 03/06/2025
  * Preconditions: 
- * Postconditions: 
+ * - Requires a valid Google Gemini API key stored in environment variables.
+ * - Input text should be a privacy policy or similar document.
+ * Postconditions: Outputs a summarized version of the privacy policy in a clear bullet-point format
  * Error and exceptions: 
- * Side effects:
- * Invariants:
- * Any known faults: 
+ * Side effects: None
+ * Invariants: None
+ * Any known faults: None
  *********************************************************/
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
