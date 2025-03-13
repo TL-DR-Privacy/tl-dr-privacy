@@ -1,12 +1,23 @@
 /*********************************************************
- * David Westerhaus & Raven Duong
+ * Prologue Comments
  * helpers.js
- * Created: 02/21/2025
  * 
+ * Description:
  * 1) Contains helper functions for the policy-finding process.
  * 2) Includes functions for user input and filename generation.
  * 3) Defines a function to check if a link is relevant.
  * 4) Uses AWS SDK v3 for S3 storage.
+ * 
+ * Programmer’s name: David Westerhaus & Raven Duong
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
+ * 
  *********************************************************/
 
 import { S3Client, HeadObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';

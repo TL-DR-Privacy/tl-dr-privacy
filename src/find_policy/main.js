@@ -1,8 +1,8 @@
 /*********************************************************
- * David Westerhaus & Raven Duong
+ * Prologue Comments
  * main.js
- * Created: 03/06/2025
  * 
+ * Description:
  * 1) Starts policy finding logic. Decided to modularize the finding logic instead of using a single file.
  * 2) Waits for the user to input a website URL.
  * 3) Calls the findPrivacyPolicy function to start the process.
@@ -10,6 +10,16 @@
  * 5) Extracts white space and non-ASCII characters from the policy text.
  * 6) Saves the policy text to a file.
  * all this will probably be replaced with code inside the actual browser extension code
+ * 
+ * Programmer’s name: David Westerhaus & Raven Duong
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
  *********************************************************/
 import fs from 'fs';
 import { getWebsiteInput, generateFilename, uploadToS3, getExistingPolicy} from './helpers.js';

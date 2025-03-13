@@ -1,10 +1,19 @@
 /*********************************************************
- * David Westerhaus
+ * Prologue Comments
  * braveSearch.js
- * Created: 03/06/2025
- * 
+ *
+ * Description: 
  * 1) Uses Brave Search API to find privacy policy links.
  * 2) Returns the top results.
+ * Programmer’s name: David Westerhaus
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
  *********************************************************/
 
 import axios from 'axios';

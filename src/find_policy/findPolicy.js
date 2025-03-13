@@ -1,14 +1,24 @@
 /*********************************************************
- * David Westerhaus & Raven Duong
+ * Prologue Comments
  * findPolicy.js
- * Created: 03/06/2025
  * 
+ * Description:
  * 1) When given a URL, this script will attempt to find a privacy policy link on the page. It does this by:
  *   - Prioritizing known privacy policy URL structures
  *   - Fallback to any link containing "privacy"
  *   - If no policy link found, it will search on Brave
  * 2) If a policy link is found, it will return the URL.
  * 3) If no policy link is found, it will return null.
+ * 
+ * Programmer’s name: David Westerhaus & Raven Duong
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
  *********************************************************/
 
 import puppeteer from 'puppeteer-extra';

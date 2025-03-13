@@ -1,14 +1,24 @@
 /*********************************************************
- * David Westerhaus & Raven Duong
+ *Prologue Comments
  * crawler.js
- * Created: 03/06/2025
  * 
+ * Description: 
  * 1) Recursively crawls relevant sub-links (max 10 pages).
  * 2) Uses Puppeteer to extract text from the page.
  * 3) Heuristics: only follow links from the same domain
  *    that contain relevant keywords in text or path.
  * 4) Stops crawling when the page limit is reached.
  * 5) Returns the concatenated text content.
+ * 
+ * Programmer’s name: David Westerhaus & Raven Duong
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
  *********************************************************/
 
 import puppeteer from 'puppeteer-extra';

@@ -1,3 +1,30 @@
+/*********************************************************
+ * Prologue Comments
+ * findPolicy.js
+ * 
+ * Description:
+ * 1) This script utilizes the Google Gemini API to generate concise summaries of privacy policies.
+ * 2) Given a privacy policy as input, the script:
+ *   - Sends the text to the Gemini API with a predefined prompt.
+ *   - Requests a bullet-point summary covering key aspects such as:
+ *     - Data collection practices.
+ *     - Data usage and sharing.
+ *     - Retention policies.
+ *     - User rights and controls.
+ *     - Notable disclosures or disclaimers.
+ * 3) If the API call is successful, the summarized text is returned.
+ * 4) If the API fails, the original text is returned as a fallback.
+ * 
+ * Programmer’s name: David Westerhaus 
+ * Created: 03/06/2025
+ * Revised: 03/06/2025
+ * Preconditions: 
+ * Postconditions: 
+ * Error and exceptions: 
+ * Side effects:
+ * Invariants:
+ * Any known faults: 
+ *********************************************************/
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
