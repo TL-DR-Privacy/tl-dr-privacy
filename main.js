@@ -27,7 +27,6 @@
  * Invariants: None
  * Any known faults: None
  *********************************************************/
-import fs from 'fs';
 import { getWebsiteInput, generateFilename, uploadToS3, getExistingPolicy} from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
