@@ -27,54 +27,63 @@
  * Invariants: None
  * Any known faults: None
  *********************************************************/
-import { getWebsiteInput, generateFilename, uploadToS3, getExistingPolicy} from './helpers.js';
+import express from 'express';
+import bodyParser from 'body-parser';
+import { generateFilename, uploadToS3, getExistingPolicy } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';
 
-(async () => {
-  const site = await getWebsiteInput();
-  if (!site.startsWith('http')) {
-    console.log("Please enter a valid URL (e.g., https://www.example.com)");
-    process.exit(1);
-  }
-  // Generate expected filename
-  const filename = generateFilename(site);
+const app = express();
+app.use(bodyParser.json());
 
-  // 0) First, check if the privacy policy already exists in S3 and get its content
-  const existingContent = await getExistingPolicy(filename);
-  if (existingContent) {
-    console.log(`Privacy policy for ${site} already exists in S3. Summary:`);
-    console.log(existingContent);
-    process.exit(0); // Exit if found
+app.post('/analyze', async (req, res) => {
+  const { url } = req.body;
+
+  // Basic validation
+  if (!url || !url.startsWith('http')) {
+    return res.status(400).json({ error: 'Please provide a valid URL (e.g., https://example.com)' });
   }
 
-  // 1) Attempt to find a policy link on the main site
-  const policyUrl = await findPrivacyPolicy(site);
-  if (!policyUrl) {
-    console.log("No privacy policy URL found at all. Exiting...");
-    process.exit(0);
+  try {
+    const filename = generateFilename(url);
+
+    // Check if the policy already exists in S3
+    const existingContent = await getExistingPolicy(filename);
+    if (existingContent) {
+      return res.json({ summary: existingContent, source: 'cached' });
+    }
+
+    // Find the privacy policy URL
+    const policyUrl = await findPrivacyPolicy(url);
+    if (!policyUrl) {
+      return res.status(404).json({ error: 'No privacy policy URL found for the given site.' });
+    }
+
+    // Crawl and extract policy text (recursively, up to 10 pages)
+    const visited = new Set();
+    const pageCount = { count: 0 };
+    const maxPages = 10;
+    const fullText = await extractPolicyText(policyUrl, visited, maxPages, pageCount);
+
+    // Clean and summarize text
+    const finalText = fullText
+      .replace(/\s+/g, '')
+      .replace(/[^\x21-\x7E]/g, '');
+    const summary = await summarizeText(finalText);
+
+    // Upload to S3 and return the result
+    await uploadToS3(filename, summary);
+    return res.json({ summary, source: 'new' });
+
+  } catch (err) {
+    console.error('Error during analysis:', err);
+    return res.status(500).json({ error: 'Internal server error during analysis.' });
   }
+});
 
-  // 2) Extract text from the found or Brave-result policy page
-  //    with recursion up to 10 pages
-  const visited = new Set();
-  const pageCount = { count: 0 };
-  const maxPages = 10;
-
-  const fullText = await extractPolicyText(policyUrl, visited, maxPages, pageCount);
-  const finalText = fullText
-    .replace(/\s+/g, '')            // Strip out ALL white space
-    .replace(/[^\x21-\x7E]/g, '');    // Remove characters outside the printable ASCII range (english only). We might revisit this later to add support for other langugaes.
-  
-  // 3) Summarize the cleaned text using your Gemini API to produce a TL;DR summary
-  const summary = await summarizeText(finalText);
-
-  console.log("Summary: ", summary);
-
-  // 4) Upload the summary to SQL
-  console.log(`\nUploading privacy policy to S3: ${filename}`);
-  await uploadToS3(filename, summary);
-
-})();
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🔍 Privacy Policy API server is running on http://localhost:${PORT}`);
+});
 
