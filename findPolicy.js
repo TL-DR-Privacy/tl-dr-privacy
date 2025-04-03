@@ -36,7 +36,7 @@ dotenv.config();
 puppeteer.use(StealthPlugin());
 
 export async function findPrivacyPolicy(url) {
-  const browser = await puppeteer.launch({ headless: true }); // headless: false for debugging, true for production 
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'], }); // headless: false for debugging, true for production 
   const page = await browser.newPage();
 
   try {

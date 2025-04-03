@@ -50,7 +50,7 @@ export async function extractPolicyText(url, visited, maxPages, pageCount) {
   let textContent = "";
 
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({ headless: true , args: ['--no-sandbox', '--disable-setuid-sandbox'],});
     const page = await browser.newPage();
 
     // Some extra stealth or user agent spoofs can be set here if needed
