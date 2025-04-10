@@ -29,7 +29,7 @@
  *********************************************************/
 import express from 'express';
 import bodyParser from 'body-parser';
-import { generateFilename, uploadToS3, getExistingPolicy } from './helpers.js';
+import { generateFilename, uploadToPostgres, getExistingPolicy } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';
