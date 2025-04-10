@@ -3,27 +3,27 @@
  * helpers.js
  * 
  * Description:
- * 1) Contains helper functions for the policy-finding process.
- * 2) Includes functions for user input and filename generation.
- * 3) Defines a function to check if a link is relevant.
- * 4) Uses AWS SDK v3 for S3 storage.
+ * 1) Contains helper functions for the privacy policy processing pipeline.
+ * 2) Includes functions for user input, filename generation, and link relevance filtering.
+ * 3) Interfaces with PostgreSQL to retrieve and store policy summaries.
  * 
- * Programmer’s name: David Westerhaus & Raven Duong
+ * Programmer’s names: David Westerhaus & Raven Duong
  * Created: 03/06/2025
- * Revised: 03/06/2025
+ * Revised: 04/10/2025
  * Preconditions: 
- * - Requires AWS SDK v3 for S3 operations
- * - Environment variables must include valid AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET_NAME`)
- * - The input website URL must be valid
+ * - PostgreSQL connection must be configured via environment variable POSTGRES_URL.
+ * - The database must contain a table named "privacy-policies" with appropriate columns.
+ * - The input website URL must be valid.
  * Postconditions: 
- * - Returns extracted privacy policy text from S3 if available
- * - Uploads new privacy policies to S3 if they don’t already exist
- * - Provides heuristic-based filtering of relevant links
- * Error and exceptions: None
- * Side effects: None
+ * - Returns cached summaries from the database if available.
+ * - Uploads new summaries to PostgreSQL.
+ * - Provides heuristics for determining if a link is privacy-related.
+ * Error and exceptions: 
+ * - Logs and handles SQL connection or query errors gracefully.
+ * Side effects: 
+ * - Writes and updates entries in the database.
  * Invariants: None
  * Any known faults: None
- * 
  *********************************************************/
 
 //import { S3Client, HeadObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';

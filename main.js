@@ -3,29 +3,28 @@
  * main.js
  * 
  * Description:
- * 1) Starts policy finding logic. Decided to modularize the finding logic instead of using a single file.
- * 2) Waits for the user to input a website URL.
- * 3) Calls the findPrivacyPolicy function to start the process.
- * 4) Crawls the found website for relevant policy links and text.
- * 5) Extracts white space and non-ASCII characters from the policy text.
- * 6) Saves the policy text to a file.
- * all this will probably be replaced with code inside the actual browser extension code
+ * 1) Implements the main API server for tl;dr Privacy.
+ * 2) Provides a POST endpoint (/analyze) to process and summarize privacy policies.
+ * 3) Extracts and crawls privacy policy text from the web.
+ * 4) Cleans and summarizes policy content using the Gemini API.
+ * 5) Caches summaries in a PostgreSQL database via Railway.
  * 
- * Programmer’s name: David Westerhaus & Raven Duong
+ * Programmer’s names: David Westerhaus & Raven Duong
  * Created: 03/06/2025
- * Revised: 03/06/2025
+ * Revised: 04/10/2025
  * Preconditions: 
- * - Requires a valid website URL input
- * - AWS S3 credentials must be set in environment variables
- * - The `findPolicy.js`, `crawler.js`, `helpers.js`, and `gemini.js` modules must be correctly implemented
- * - The Google Gemini API key must be configured for summarization
+ * - Environment must contain: POSTGRES_URL and GEMINI_API_KEY
+ * - Modules findPolicy.js, crawler.js, helpers.js, and gemini.js must be functional
+ * - Input must include a valid URL (https://...)
  * Postconditions: 
- * - If a policy is found, a cleaned and summarized version is stored in AWS S3
- * - If no policy is found, the script exits gracefully with appropriate messages
- * Error and exceptions: None
- * Side effects: None
+ * - Responds with a summarized privacy policy (from cache or newly crawled)
+ * - Stores new summaries in PostgreSQL
+ * Error and exceptions: 
+ * - Catches errors related to HTTP, crawling, and summarization
+ * Side effects: 
+ * - Writes to PostgreSQL
  * Invariants: None
- * Any known faults: None
+ * Known faults: None
  *********************************************************/
 import express from 'express';
 import bodyParser from 'body-parser';
