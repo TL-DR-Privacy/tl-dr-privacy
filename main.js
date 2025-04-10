@@ -72,7 +72,7 @@ app.post('/analyze', async (req, res) => {
       .replace(/[^\x21-\x7E]/g, '');
     const summary = await summarizeText(finalText);
 
-    // Upload to S3 and return the result
+    // Upload to sql and return the result
     await uploadToPostgres(filename, summary);
     return res.json({ summary, source: 'new' });
 
