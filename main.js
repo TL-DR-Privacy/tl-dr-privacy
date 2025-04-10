@@ -73,7 +73,7 @@ app.post('/analyze', async (req, res) => {
     const summary = await summarizeText(finalText);
 
     // Upload to S3 and return the result
-    await uploadToS3(filename, summary);
+    await uploadToPostgres(filename, summary);
     return res.json({ summary, source: 'new' });
 
   } catch (err) {
