@@ -29,7 +29,7 @@
  *********************************************************/
 import express from 'express';
 import bodyParser from 'body-parser';
-import { generateFilename, uploadToS3, getExistingPolicy } from './helpers.js';
+import { generateFilename, uploadToPostgres, getExistingPolicy } from './helpers.js';
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';
@@ -72,8 +72,8 @@ app.post('/analyze', async (req, res) => {
       .replace(/[^\x21-\x7E]/g, '');
     const summary = await summarizeText(finalText);
 
-    // Upload to S3 and return the result
-    await uploadToS3(filename, summary);
+    // Upload to sql and return the result
+    await uploadToPostgres(filename, summary);
     return res.json({ summary, source: 'new' });
 
   } catch (err) {

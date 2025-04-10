@@ -26,115 +26,77 @@
  * 
  *********************************************************/
 
-import { S3Client, HeadObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+//import { S3Client, HeadObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { pool } from './postgresClient.js';
 import { URL } from 'url';
 import readline from 'readline';
 import dotenv from 'dotenv';
-
 dotenv.config();
-
-// AWS S3 Configuration (Using SDK v3)
-const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
-});
-const BUCKET_NAME = process.env.S3_BUCKET_NAME;
-
-// --- Check If Privacy Policy Already Exists in S3 ---
-export async function checkIfFileExists(filename) {
-    const params = {
-        Bucket: BUCKET_NAME,
-        Key: filename
-    };
-
-    try {
-        await s3.send(new HeadObjectCommand(params)); // Check if file exists
-        console.log(`Privacy policy already exists in S3: ${filename}`);
-        return true;
-    } catch (error) {
-        if (error.name === 'NotFound') {
-            return false; // File does not exist, but no unnecessary logging
-        } else {
-            console.error("Error checking S3:", error.message);
-            return false;
-        }
-    }
-}
-
-// --- Retrieve an Existing Privacy Policy from S3 ---
-export async function getExistingPolicy(filename) {
-    const params = {
-        Bucket: BUCKET_NAME,
-        Key: filename
-    };
-
-    try {
-        const data = await s3.send(new GetObjectCommand(params));
-        const bodyContents = await data.Body.transformToString();
-        return bodyContents;
-    } catch (error) {
-        if (error.name === 'NoSuchKey') {
-            return null; // File not found, avoid unnecessary logs
-        } else {
-            console.error("Error retrieving S3 file:", error.message);
-            return null;
-        }
-    }
-}
-
-// --- Upload to S3 (Without Rechecking) ---
-export async function uploadToS3(filename, content, alreadyChecked = false) {
-    // Skip redundant checks if we already confirmed the file does not exist
-    if (!alreadyChecked) {
-        const exists = await checkIfFileExists(filename);
-        if (exists) {
-            console.log(`Skipping upload: Privacy policy for ${filename} already exists in S3.`);
-            return;
-        }
-    }
-
-    const params = {
-        Bucket: BUCKET_NAME,
-        Key: filename,
-        Body: content,
-        ContentType: "text/plain"
-    };
-
-    try {
-        await s3.send(new PutObjectCommand(params));
-        console.log(`Uploaded to S3: ${filename}`);
-    } catch (error) {
-        console.error("Error uploading to S3:", error.message);
-    }
-}
-
-// --- User Input (website URL) ---
-export function getWebsiteInput() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    return new Promise((resolve) => {
-        rl.question("Enter website URL: ", (url) => {
-            rl.close();
-            resolve(url.trim());
-        });
-    });
-}
 
 // --- Generate a filename from the site domain ---
 export function generateFilename(websiteURL) {
     try {
-        const domain = new URL(websiteURL).hostname.replace(/\./g, "_");
-        return `privacy_policy_${domain}.txt`;
+      const domain = new URL(websiteURL).hostname.replace(/\./g, "_");
+      return `privacy_policy_${domain}.txt`;
     } catch (err) {
-        return 'privacy_policy_generic.txt';
+      return 'privacy_policy_generic.txt';
     }
 }
+  
+export async function getExistingPolicy(filename) {
+    const domain = filename.replace('privacy_policy_', '').replace('.txt', '').replace(/_/g, '.');
+    try {
+      const { rows } = await pool.query(
+        'SELECT policy FROM "privacy-policies" WHERE base_url = $1',
+        [domain]
+      );
+  
+      if (rows.length > 0) {
+        await pool.query(
+          'UPDATE "privacy-policies" SET last_requested = NOW() WHERE base_url = $1',
+          [domain]
+        );
+        return rows[0].policy;
+      } else {
+        return null;
+      }
+    } catch (err) {
+      console.error('Postgres SELECT error:', err.message);
+      return null;
+    }
+}
+export async function uploadToPostgres(filename, content) {
+    const domain = filename.replace('privacy_policy_', '').replace('.txt', '').replace(/_/g, '.');
+    try {
+      await pool.query(
+        `INSERT INTO "privacy-policies" (base_url, policy, last_updated, last_requested)
+         VALUES ($1, $2, NOW(), NOW())
+         ON CONFLICT (base_url) DO UPDATE
+         SET policy = EXCLUDED.policy,
+             last_updated = NOW(),
+             last_requested = NOW()`,
+        [domain, content]
+      );
+      console.log(`Saved to PostgreSQL: ${domain}`);
+    } catch (err) {
+      console.error('Postgres INSERT error:', err.message);
+    }
+}
+  
+export function getWebsiteInput() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  
+    return new Promise((resolve) => {
+      rl.question("Enter website URL: ", (url) => {
+        rl.close();
+        resolve(url.trim());
+      });
+    });
+}
+  
 
 // --- HELPER: Check if a link is "relevant" (heuristics) ---
 /**
