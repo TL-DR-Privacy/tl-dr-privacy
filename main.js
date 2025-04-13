@@ -62,8 +62,12 @@ app.post('/analyze', async (req, res) => {
     // Crawl and extract policy text (recursively, up to 10 pages)
     const visited = new Set();
     const pageCount = { count: 0 };
-    const maxPages = 10;
+    const maxPages = 1;
     const fullText = await extractPolicyText(policyUrl, visited, maxPages, pageCount);
+    //console.log(`Extracted text from ${policyUrl}:`, fullText);
+    if (!fullText) {
+      return res.status(404).json({ error: 'No text found in the privacy policy.' });
+    }
 
     // Clean and summarize text
     const finalText = fullText

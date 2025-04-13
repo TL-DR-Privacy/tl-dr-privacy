@@ -40,7 +40,7 @@ export async function findPrivacyPolicy(url) {
   const page = await browser.newPage();
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     // Extract all links from the page
     const links = await page.$$eval('a', (anchors) =>

@@ -46,7 +46,7 @@ export async function searchBravePrivacyPolicy(site) {
       },
       params: {
         q: query,
-        count: 3
+        count: 1
       }
     });
 
