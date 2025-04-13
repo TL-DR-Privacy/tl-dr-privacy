@@ -12,7 +12,7 @@
  * 
  * Programmer’s name: David Westerhaus & Raven Duong
  * Created: 03/06/2025
- * Revised: 03/06/2025
+ * Revised: 04/13/2025
  * Preconditions: 
  * - Requires Puppeteer with the stealth plugin installed
  * - Requires a valid Brave Search API key (if Brave search is needed)
@@ -40,7 +40,7 @@ export async function findPrivacyPolicy(url) {
   const page = await browser.newPage();
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     // Extract all links from the page
     const links = await page.$$eval('a', (anchors) =>

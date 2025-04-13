@@ -3,7 +3,7 @@
  * crawler.js
  * 
  * Description: 
- * 1) Recursively crawls relevant sub-links (max 10 pages).
+ * 1) Recursively crawls relevant sub-links (max 1 page).
  * 2) Uses Puppeteer to extract text from the page.
  * 3) Heuristics: only follow links from the same domain
  *    that contain relevant keywords in text or path.
@@ -12,7 +12,7 @@
  * 
  * Programmer’s name: David Westerhaus & Raven Duong
  * Created: 03/06/2025
- * Revised: 03/06/2025
+ * Revised: 04/13/2025
  * Preconditions: 
  * - Requires Puppeteer and puppeteer-extra with the stealth plugin.
  * - Input URL must be valid and accessible.
@@ -33,52 +33,42 @@ import { isRelevantLink } from './helpers.js';
 puppeteer.use(StealthPlugin());
 
 export async function extractPolicyText(url, visited, maxPages, pageCount) {
-  // If we have reached the limit, stop
-  if (pageCount.count >= maxPages) {
+  if (pageCount.count >= maxPages || visited.has(url)) {
     return "";
   }
-  // If we've visited this exact URL before, skip it
-  if (visited.has(url)) {
-    return "";
-  }
-  visited.add(url);
 
-  console.log(`Crawling (#${pageCount.count + 1}): ${url}`);
+  visited.add(url);
   pageCount.count++;
+  console.log(`Crawling (#${pageCount.count}): ${url}`);
 
   let browser;
   let textContent = "";
 
   try {
-    browser = await puppeteer.launch({ headless: true , args: ['--no-sandbox', '--disable-setuid-sandbox'],});
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+
     const page = await browser.newPage();
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+    );
+    await page.setViewport({ width: 1366, height: 768 });
 
-    // Some extra stealth or user agent spoofs can be set here if needed
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+    // Fast initial load
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      textContent = await page.evaluate(() => document.body.innerText || "");
+    } catch (fastErr) {
+      console.warn(`Initial fast load failed for ${url}:`, fastErr.message);
+    }
 
-    // Grab the main text
-    textContent = await page.evaluate(() => document.body.innerText || "");
-
-    // Grab all the links on the page
-    const anchorData = await page.$$eval('a', (anchors) => {
-      return anchors.map(a => ({
-        text: a.innerText.trim(),
-        href: a.href
-      }));
-    });
-
-    // Heuristics: only follow links from the same domain
-    // that contain relevant keywords in text or path
-    const baseDomain = new URL(url).hostname;
-    const relevantLinks = anchorData.filter(linkObj => {
-      return isRelevantLink(linkObj.text, linkObj.href, baseDomain);
-    });
-
-    // Recursively follow those relevant sub-links
-    for (let linkObj of relevantLinks) {
-      if (pageCount.count >= maxPages) break; // Enforce limit
-      const subText = await extractPolicyText(linkObj.href, visited, maxPages, pageCount);
-      textContent += `\n\n${subText}`;
+    // If text is too short or empty, try again with networkidle2
+    if (!textContent || textContent.trim().length < 200) {
+      console.log(`🕵️ Retrying ${url} with networkidle2...`);
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      textContent = await page.evaluate(() => document.body.innerText || "");
     }
 
   } catch (error) {
@@ -86,6 +76,6 @@ export async function extractPolicyText(url, visited, maxPages, pageCount) {
   } finally {
     if (browser) await browser.close();
   }
-  
+
   return textContent;
 }
