@@ -1,3 +1,31 @@
+/*********************************************************
+ * Prologue Comments
+ * cron.js
+ * 
+ * Description:
+ * 1) Executes a scheduled deep crawl of the top 50 websites.
+ * 2) For each site, finds the privacy policy, crawls up to 10 pages,
+ *    and summarizes the content using the Gemini API.
+ * 3) Cleans and stores the summary in PostgreSQL via Railway.
+ * 4) Intended to be run as a monthly cron job on Railway.
+ * 
+ * Programmer’s names: David Westerhaus & Raven Duong
+ * Created: 04/13/2025
+ * Revised: 04/13/2025
+ * Preconditions: 
+ * - Environment must contain: POSTGRES_URL and GEMINI_API_KEY
+ * - Modules findPolicy.js, crawler.js, helpers.js, and gemini.js must be functional
+ * Postconditions: 
+ * - Updates or inserts deep policy summaries into PostgreSQL
+ * Error and exceptions: 
+ * - Catches and logs errors for failed websites
+ * Side effects: 
+ * - Writes summaries to PostgreSQL
+ * Invariants: None
+ * Known faults: None
+ *********************************************************/
+
+
 import { findPrivacyPolicy } from './findPolicy.js';
 import { extractPolicyText } from './crawler.js';
 import { summarizeText } from './gemini.js';

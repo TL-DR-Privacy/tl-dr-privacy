@@ -12,7 +12,7 @@
  * 
  * Programmer’s name: David Westerhaus & Raven Duong
  * Created: 03/06/2025
- * Revised: 03/06/2025
+ * Revised: 04/13/2025
  * Preconditions: 
  * - Requires Puppeteer with the stealth plugin installed
  * - Requires a valid Brave Search API key (if Brave search is needed)
